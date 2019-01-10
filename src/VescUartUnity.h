@@ -17,7 +17,8 @@ class VescUartUnity
 		float avgMotorCurrent0;
 		float avgMotorCurrent1;
 		float avgInputCurrent;
-		float dutyCycleNow;
+		float dutyCycleNow0;
+		float dutyCycleNow1;
 		long rpm;
 		float inpVoltage;
 		float ampHours;

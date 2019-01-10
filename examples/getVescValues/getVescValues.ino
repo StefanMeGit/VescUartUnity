@@ -1,3 +1,8 @@
+#include <buffer.h>
+#include <crc.h>
+#include <datatypes.h>
+#include <VescUartUnity.h>
+
 /*
   Name:    getVescValues.ino
   Created: 19-08-2018
@@ -6,7 +11,7 @@
                 A Arduino Nano or Uno that only has one Serial port will not be able to display the data returned.
 */
 
-#include <VescUart.h>
+
 
 /** Initiate VescUart class */
 VescUart UART;

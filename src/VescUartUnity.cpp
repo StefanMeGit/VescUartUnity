@@ -1,24 +1,24 @@
-#include "VescUnityUart.h"
+#include "VescUartUnity.h"
 #include <HardwareSerial.h>
 
-VescUnityUart::VescUnityUart(void){
+VescUartUnity::VescUartUnity(void){
 	nunchuck.valueX         = 127;
 	nunchuck.valueY         = 127;
 	nunchuck.lowerButton  	= false;
 	nunchuck.upperButton  	= false;
 }
 
-void VescUnityUart::setSerialPort(HardwareSerial* port)
+void VescUartUnity::setSerialPort(HardwareSerial* port)
 {
 	serialPort = port;
 }
 
-void VescUnityUart::setDebugPort(Stream* port)
+void VescUartUnity::setDebugPort(Stream* port)
 {
 	debugPort = port;
 }
 
-int VescUnityUart::receiveUartMessage(uint8_t * payloadReceived) {
+int VescUartUnity::receiveUartMessage(uint8_t * payloadReceived) {
 
 	// Messages <= 255 starts with "2", 2nd byte is length
 	// Messages > 255 starts with "3" 2nd and 3rd byte is length combined with 1st >>8 and then &0xFF
@@ -96,7 +96,7 @@ int VescUnityUart::receiveUartMessage(uint8_t * payloadReceived) {
 }
 
 
-bool VescUnityUart::unpackPayload(uint8_t * message, int lenMes, uint8_t * payload) {
+bool VescUartUnity::unpackPayload(uint8_t * message, int lenMes, uint8_t * payload) {
 
 	uint16_t crcMessage = 0;
 	uint16_t crcPayload = 0;
@@ -135,7 +135,7 @@ bool VescUnityUart::unpackPayload(uint8_t * message, int lenMes, uint8_t * paylo
 }
 
 
-int VescUnityUart::packSendPayload(uint8_t * payload, int lenPay) {
+int VescUartUnity::packSendPayload(uint8_t * payload, int lenPay) {
 
 	uint16_t crcPayload = crc16(payload, lenPay);
 	int count = 0;
@@ -173,7 +173,7 @@ int VescUnityUart::packSendPayload(uint8_t * payload, int lenPay) {
 }
 
 
-bool VescUnityUart::processReadPacket(uint8_t * message) {
+bool VescUartUnity::processReadPacket(uint8_t * message) {
 
 	COMM_PACKET_ID packetId;
 	int32_t ind = 0;
@@ -184,6 +184,7 @@ bool VescUnityUart::processReadPacket(uint8_t * message) {
 	switch (packetId){
 		case COMM_GET_VALUES: // Structure defined here: https://github.com/vedderb/bldc/blob/43c3bbaf91f5052a35b75c2ff17b5fe99fad94d1/commands.c#L164
 
+			ind = 0;
 			data.filteredFetTemp0  		= buffer_get_float16(message, 10.0, &ind);
 			data.filteredFetTemp1  		= buffer_get_float16(message, 10.0, &ind);
 			data.filteredMotorTemp0  	= buffer_get_float16(message, 10.0, &ind);
@@ -223,7 +224,7 @@ bool VescUnityUart::processReadPacket(uint8_t * message) {
 	}
 }
 
-bool VescUnityUart::getVescValues(void) {
+bool VescUartUnity::getVescValues(void) {
 
 	uint8_t command[1] = { COMM_GET_VALUES };
 	uint8_t payload[256];
@@ -243,7 +244,7 @@ bool VescUnityUart::getVescValues(void) {
 	}
 }
 
-void VescUnityUart::setNunchuckValues() {
+void VescUartUnity::setNunchuckValues() {
 	int32_t ind = 0;
 	uint8_t payload[11];
 
@@ -270,7 +271,7 @@ void VescUnityUart::setNunchuckValues() {
 	packSendPayload(payload, 11);
 }
 
-void VescUnityUart::setCurrent(float current) {
+void VescUartUnity::setCurrent(float current) {
 	int32_t index = 0;
 	uint8_t payload[5];
 
@@ -280,7 +281,7 @@ void VescUnityUart::setCurrent(float current) {
 	packSendPayload(payload, 5);
 }
 
-void VescUnityUart::setBrakeCurrent(float brakeCurrent) {
+void VescUartUnity::setBrakeCurrent(float brakeCurrent) {
 	int32_t index = 0;
 	uint8_t payload[5];
 
@@ -290,7 +291,7 @@ void VescUnityUart::setBrakeCurrent(float brakeCurrent) {
 	packSendPayload(payload, 5);
 }
 
-void VescUnityUart::setRPM(float rpm) {
+void VescUartUnity::setRPM(float rpm) {
 	int32_t index = 0;
 	uint8_t payload[5];
 
@@ -300,7 +301,7 @@ void VescUnityUart::setRPM(float rpm) {
 	packSendPayload(payload, 5);
 }
 
-void VescUnityUart::setDuty(float duty) {
+void VescUartUnity::setDuty(float duty) {
 	int32_t index = 0;
 	uint8_t payload[5];
 
@@ -310,7 +311,7 @@ void VescUnityUart::setDuty(float duty) {
 	packSendPayload(payload, 5);
 }
 
-void VescUnityUart::serialPrint(uint8_t * data, int len) {
+void VescUartUnity::serialPrint(uint8_t * data, int len) {
 	if(debugPort != NULL){
 		for (int i = 0; i <= len; i++)
 		{
@@ -322,7 +323,7 @@ void VescUnityUart::serialPrint(uint8_t * data, int len) {
 	}
 }
 
-void VescUnityUart::printVescValues() {
+void VescUartUnity::printVescValues() {
 	if(debugPort != NULL){
 		debugPort->print("filteredFetTemp0: "); 	debugPort->println(data.filteredFetTemp0);
 		debugPort->print("filteredFetTemp1: "); 	debugPort->println(data.filteredFetTemp1);
